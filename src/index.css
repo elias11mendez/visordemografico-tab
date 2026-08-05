@@ -1,0 +1,42 @@
+@import "tailwindcss";
+
+:root,
+body,
+#root {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+/* Contenedor de MapLibre */
+.maplibregl-map {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 100%;
+}
+
+.maplibregl-canvas {
+  width: 100% !important;
+  height: 100% !important;
+  outline: none;
+
+  touch-action: none; 
+}
+
+
+.panels-container,
+.controls-container,
+.fixed {
+  pointer-events: none;
+}
+
+.panels-container > *,
+.controls-container > *,
+.fixed > *,
+button,
+select,
+input {
+  pointer-events: auto; 
+}

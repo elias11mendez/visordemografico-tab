@@ -6,7 +6,9 @@ export default defineConfig({
     tailwindcss(),
   ],
   define: {
-    // Define process.env vacío para evitar que rompan dependencias antiguas
+    // Parche completo para librerías que buscan la global process o NODE_ENV
     'process.env': {},
+    'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'production'),
+    'global': 'window',
   },
 })

@@ -6,8 +6,14 @@ import { ComparisonPanel } from "./ComparisonPanel";
 import { RankingCoropletas } from "./RankingCoropletas";
 
 function AnalysisPanel() {
-  const { compareMode, selectedB, setShowCoropletas, showCoropletas } =
-    useMapInstance();
+  const { 
+    compareMode, 
+    setCompareMode, 
+    selectedB, 
+    setSelectedB, 
+    showCoropletas, 
+    setShowCoropletas 
+  } = useMapInstance();
 
   const [isExpanded, setIsExpanded] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
@@ -27,8 +33,28 @@ function AnalysisPanel() {
     }
   };
 
-  // Determinamos si el usuario activó la comparativa
-  const isComparing = compareMode || Boolean(selectedB);
+  // 1. Estado derivado de comparación
+  const isComparing = Boolean(compareMode || selectedB);
+
+  // ⚡ 2. LIMPIEZA AUTOMÁTICA AL ACTIVAR COROPLETAS
+  // Si showCoropletas se vuelve true, desactivamos el comparador por completo
+  useEffect(() => {
+    if (showCoropletas) {
+      if (compareMode) setCompareMode(false);
+      if (selectedB) setSelectedB(null);
+    }
+  }, [showCoropletas, compareMode, selectedB, setCompareMode, setSelectedB]);
+
+  // 🖼️ 3. RENDERIZADO EXCLUSIVO (Prioridad: Coropletas si el usuario las activó)
+  const renderActivePanel = () => {
+    if (showCoropletas) {
+      return <RankingCoropletas />;
+    }
+    if (isComparing) {
+      return <ComparisonPanel />;
+    }
+    return <DemographyPanel />;
+  };
 
   return (
     <motion.div
@@ -67,14 +93,9 @@ function AnalysisPanel() {
         </div>
       </div>
 
+      {/* CONTENEDOR DE PANELES EXCLUSIVOS */}
       <div className="flex-1 min-h-0 relative flex flex-col">
-        {isComparing ? (
-          <ComparisonPanel />
-        ) : showCoropletas ? (
-          <RankingCoropletas />
-        ) : (
-          <DemographyPanel />
-        )}
+        {renderActivePanel()}
       </div>
     </motion.div>
   );

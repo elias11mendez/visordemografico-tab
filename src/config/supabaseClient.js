@@ -5,7 +5,7 @@ const SUPABASE_ANON_KEY = import.meta.env?.VITE_SUPABASE_ANON_KEY;
 
 if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
   console.error(
-    "❌ Error: Las variables de entorno de Supabase no están definidas. " +
+    "Error: Las variables de entorno de Supabase no están definidas. " +
     "Revisa tu configuración en Netlify o tu archivo .env local."
   );
 }

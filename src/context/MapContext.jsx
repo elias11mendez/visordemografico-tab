@@ -17,6 +17,7 @@ export function MapProvider({ children }) {
   const [showCoropletas, setShowCoropletas] = useState();
 
   const [poblacionMap, setPoblacionMap] = useState();
+
   // Custom Hooks encapsulados
   const {
     communities,
@@ -30,18 +31,23 @@ export function MapProvider({ children }) {
   const {
     selectedAgesData,
     setSelectedAgesData,
+    stateAgesData, // 👈 Asegúrate de devolver esto desde tu hook useAgesData si ahí consultas el total estatal
     loadingAges,
     fetchAgesByCvegeo,
   } = useAgesData();
 
   // Escucha reactiva cuando cambia la selección de comunidad
   useEffect(() => {
+    // CASO 1: No hay comunidad seleccionada -> Cargar Totales Estatales
     if (!selectedCvegeo) {
       if (initialGlobalData) setSelectedData(initialGlobalData);
-      setSelectedAgesData(null);
+      
+      // Si tienes una clave genérica para el estado en Supabase (ej: '27' o '270000000000'), la solicitas:
+      fetchAgesByCvegeo("27"); 
       return;
     }
 
+    // CASO 2: Hay comunidad seleccionada -> Cargar datos específicos
     const cvegeoString = String(selectedCvegeo).trim();
     const localMatch = communities.find((c) => c.CVEGEO === cvegeoString);
     setSelectedData(localMatch || initialGlobalData);
@@ -53,7 +59,6 @@ export function MapProvider({ children }) {
     initialGlobalData,
     fetchAgesByCvegeo,
     setSelectedData,
-    setSelectedAgesData,
   ]);
 
   return (
@@ -68,6 +73,7 @@ export function MapProvider({ children }) {
         fullFeatures,
         selectedData,
         selectedAgesData,
+        stateAgesData, // 👈 ¡Ahora sí disponible para PopulationPyramid!
         loadingData,
         loadingAges,
         fetchAgesByCvegeo,

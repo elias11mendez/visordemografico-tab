@@ -10,7 +10,7 @@ export function ComparisonPanel() {
     selectedB,
     setSelectedB,
     setCompareMode,
-    selectedData, // 👈 Se consume los datos globales de la zona seleccionada con clic en el mapa
+    selectedData,
   } = useMapInstance();
 
   const [dataA, setDataA] = useState(null);
@@ -19,7 +19,6 @@ export function ComparisonPanel() {
   const [loadingB, setLoadingB] = useState(false);
 
   // ⚡ ESCUCHAR EL CLIC DEL MAPA:
-  // Cada vez que cambia selectedData por un clic izquierdo en el mapa, actualizamos Zona A
   useEffect(() => {
     if (selectedData) {
       setSelectedA(selectedData);
@@ -135,23 +134,23 @@ export function ComparisonPanel() {
 
   const isLoading = loadingA || loadingB;
 
-  // Cálculo inline de porcentajes visuales de género
-  const pctHombresA = totalA > 0 ? (hombresA / totalA) * 100 : 0;
-  const pctMujeresA = totalA > 0 ? (mujeresA / totalA) * 100 : 0;
-  const pctHombresB = totalB > 0 ? (hombresB / totalB) * 100 : 0;
-  const pctMujeresB = totalB > 0 ? (mujeresB / totalB) * 100 : 0;
+  // Cálculo de porcentajes
+  const pctHombresA = totalA > 0 ? ((hombresA / totalA) * 100).toFixed(1) : "0.0";
+  const pctMujeresA = totalA > 0 ? ((mujeresA / totalA) * 100).toFixed(1) : "0.0";
+  const pctHombresB = totalB > 0 ? ((hombresB / totalB) * 100).toFixed(1) : "0.0";
+  const pctMujeresB = totalB > 0 ? ((mujeresB / totalB) * 100).toFixed(1) : "0.0";
 
   return (
-    <div className="w-full h-full font-sans flex flex-col bg-slate-50/50">
-      {/* 1. CABECERA PREMIUM */}
-      <div className="p-4 bg-white border-b border-slate-200/80 shrink-0 space-y-1 shadow-sm">
+    <div className="w-full h-full font-sans flex flex-col bg-slate-50/40">
+      {/* 1. CABECERA AL ESTILO DE LA IMAGEN */}
+      <div className="p-5 bg-white border-b border-slate-100 shrink-0 space-y-2">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-1.5">
-            <span className="p-1 bg-indigo-50 text-indigo-600 rounded-md">
-              <ArrowRightLeft className="w-4 h-4" />
+          <div className="flex items-center gap-2">
+            <span className="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-[10px] font-extrabold uppercase tracking-wider">
+              Análisis Comparativo
             </span>
-            <span className="text-[11px] font-bold uppercase tracking-wider text-indigo-600">
-              Modo Comparativa
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+              Frente a Frente
             </span>
           </div>
 
@@ -168,138 +167,150 @@ export function ComparisonPanel() {
         </div>
 
         <div>
-          <h2 className="text-base font-extrabold text-slate-900 tracking-tight">
-            Análisis Frente a Frente
+          <h2 className="text-xl font-black text-slate-900 tracking-tight uppercase">
+            Comparativa de Zonas
           </h2>
-          <p className="text-xs text-slate-500">
-            Compara indicadores demográficos en tiempo real
-          </p>
         </div>
 
         {isLoading && (
-          <div className="flex items-center gap-2 pt-1 text-xs text-indigo-500 font-medium animate-pulse">
+          <div className="flex items-center gap-2 pt-1 text-xs text-blue-600 font-medium animate-pulse">
             <Sparkles className="w-3.5 h-3.5" />
-            Consultando base de datos...
+            Actualizando datos de regiones...
           </div>
         )}
       </div>
 
       {/* 2. CONTENIDO PRINCIPAL */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
-        
-        {/* RESUMEN DE BRECHA POBLACIONAL */}
+
+        {/* TARJETA DE BRECHA POBLACIONAL / DIFERENCIA */}
         {selectedA && selectedB ? (
-          <div className="p-3.5  to-slate-900 text-black rounded-2xl  space-y-2">
-            <span className="text-[10px] font-bold text-slate-700 uppercase tracking-wider block">
-              Diferencia Demográfica
-            </span>
-            
-            <div className="flex items-baseline justify-between ">
-              <span className="text-2xl font-black font-mono tracking-tight">
-                {Math.abs(diffPoblacion).toLocaleString("es-MX")}
-                <span className="text-xs font-normal text-slate-700 ml-1">hab.</span>
+          <div className="bg-white p-4 rounded-[22px] border border-slate-100 shadow-sm space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                Diferencia Poblacional
               </span>
-              <span className="px-2 py-0.5 rounded-full text-xs font-bold text-slate-700">
+              <span className="px-2.5 py-0.5 rounded-full text-xs font-black bg-blue-50 text-blue-600">
                 {diffPoblacion === 0 ? "0%" : `+${porcentajeMayor.toFixed(1)}%`}
               </span>
             </div>
 
-            <p className="text-xs text-slate-700  t-2">
+            <div className="flex items-baseline gap-2">
+              <span className="text-3xl font-black text-slate-900 tracking-tight">
+                {Math.abs(diffPoblacion).toLocaleString("es-MX")}
+              </span>
+              <span className="text-xs font-semibold text-slate-400">Habitantes de brecha</span>
+            </div>
+
+            <p className="text-xs text-slate-500 font-medium leading-relaxed pt-1">
               {diffPoblacion === 0 ? (
-                "Ambas regiones presentan exactamente la misma población."
+                "Ambas regiones registran la misma cantidad de población."
               ) : (
                 <>
-                  <strong className="text-slate-700 font-semibold">
+                  <strong className="text-slate-800 font-bold">
                     {diffPoblacion > 0 ? getNombre(selectedA) : getNombre(selectedB)}
                   </strong>{" "}
-                  supera en población a la otra demarcación.
+                  concentra mayor densidad poblacional.
                 </>
               )}
             </p>
           </div>
         ) : (
-          <div className="p-3 bg-amber-50 border border-amber-200/60 rounded-xl text-xs text-amber-800 flex items-center gap-2.5">
+          <div className="p-3.5 bg-amber-50/70 border border-amber-200/50 rounded-2xl text-xs text-amber-800 flex items-center gap-3">
             <Info className="w-4 h-4 text-amber-600 shrink-0" />
-            <span>
+            <span className="font-medium">
               {!selectedA
                 ? "Selecciona la primera zona en el mapa."
-                : "Mantén presionado o da clic derecho en otra zona para compararla."}
+                : "Haz clic en otra zona para activar la comparación frente a frente."}
             </span>
           </div>
         )}
 
-        {/* COMPARACIÓN FRENTE A FRENTE (GRID 2 COLUMNAS) */}
+        {/* COMPARACIÓN FRENTE A FRENTE (ZONA A vs ZONA B) */}
         <div className="grid grid-cols-2 gap-3">
-          
-          {/* ZONA A */}
-          <div className="bg-white p-3 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between space-y-3">
+
+          {/* TARJETA ZONA A */}
+          <div className="bg-white p-3.5 rounded-[22px] border border-slate-100 shadow-sm flex flex-col justify-between space-y-3">
             <div>
               <div className="flex items-center justify-between mb-2">
-                <span className="px-2 py-0.5 rounded-md bg-blue-100 text-blue-700 font-black text-[11px]">
+                <span className="px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-600 font-black text-[10px] uppercase tracking-wider">
                   Zona A
                 </span>
                 {selectedA && (
                   <button
                     onClick={() => setSelectedA(null)}
-                    className="text-[10px] text-slate-400 hover:text-slate-600 hover:underline"
+                    className="text-[10px] text-slate-400 hover:text-slate-600 font-medium"
                   >
                     Limpiar
                   </button>
                 )}
               </div>
 
-              <h3 className="text-xs font-bold text-slate-800 uppercase line-clamp-2 min-h-[2rem]">
+              <h3 className="text-xs font-black text-slate-800 uppercase line-clamp-2 min-h-[2.2rem] leading-tight">
                 {selectedA ? getNombre(selectedA) : "Sin Selección"}
               </h3>
             </div>
 
             {selectedA ? (
               <div className="space-y-3 pt-2 border-t border-slate-100">
-                {/* Total */}
+                {/* Población Total */}
                 <div>
-                  <span className="text-[10px] font-medium text-slate-400 uppercase block">Total</span>
-                  <span className="text-sm font-extrabold font-mono text-slate-900">
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                    Población Total
+                  </span>
+                  <span className="text-lg font-black text-slate-900 tracking-tight">
                     {totalA.toLocaleString("es-MX")}
                   </span>
                 </div>
 
-                {/* Barra Desglose Género */}
-                <div className="space-y-1">
-                  <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden flex">
-                    <div style={{ width: `${pctHombresA}%` }} className="bg-sky-500 h-full" />
+                {/* Desglose Género */}
+                <div className="space-y-2">
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                    Distribución
+                  </span>
+
+                  <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden flex">
+                    <div style={{ width: `${pctHombresA}%` }} className="bg-blue-600 h-full" />
                     <div style={{ width: `${pctMujeresA}%` }} className="bg-pink-500 h-full" />
                   </div>
 
-                  <div className="space-y-1 pt-1">
-                    {/* Hombres */}
-                    <div className="flex justify-between items-center text-[11px]">
-                      <span className="text-sky-600 font-semibold flex items-center gap-1">
-                        <span className="w-1.5 h-1.5 rounded-full bg-sky-500" /> Homb.
-                      </span>
-                      <span className="font-mono font-bold text-slate-700">
-                        {hombresA.toLocaleString("es-MX")}
-                      </span>
+                  {/* Cajas Hombres y Mujeres estilo Píldora */}
+                  <div className="space-y-1.5">
+                    <div className="bg-slate-50 p-2 rounded-xl flex items-center justify-between">
+                      <div className="flex items-center gap-1.5">
+                        <span className="w-2 h-2 rounded-full bg-blue-600" />
+                        <span className="text-[10px] font-bold text-slate-700">Hombres</span>
+                      </div>
+                      <div className="text-right">
+                        <span className="text-xs font-black text-slate-800 block">
+                          {hombresA.toLocaleString("es-MX")}
+                        </span>
+                        <span className="text-[9px] text-slate-400 font-medium">{pctHombresA}%</span>
+                      </div>
                     </div>
 
-                    {/* Mujeres */}
-                    <div className="flex justify-between items-center text-[11px]">
-                      <span className="text-pink-600 font-semibold flex items-center gap-1">
-                        <span className="w-1.5 h-1.5 rounded-full bg-pink-500" /> Muj.
-                      </span>
-                      <span className="font-mono font-bold text-slate-700">
-                        {mujeresA.toLocaleString("es-MX")}
-                      </span>
+                    <div className="bg-slate-50 p-2 rounded-xl flex items-center justify-between">
+                      <div className="flex items-center gap-1.5">
+                        <span className="w-2 h-2 rounded-full bg-pink-500" />
+                        <span className="text-[10px] font-bold text-slate-700">Mujeres</span>
+                      </div>
+                      <div className="text-right">
+                        <span className="text-xs font-black text-slate-800 block">
+                          {mujeresA.toLocaleString("es-MX")}
+                        </span>
+                        <span className="text-[9px] text-slate-400 font-medium">{pctMujeresA}%</span>
+                      </div>
                     </div>
                   </div>
                 </div>
 
                 {/* Viviendas */}
                 {vivA > 0 && (
-                  <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px]">
-                    <span className="text-slate-400 flex items-center gap-1">
-                      <Home className="w-3 h-3" /> Viv.
+                  <div className="pt-2 border-t border-slate-100 flex items-center justify-between">
+                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
+                      <Home className="w-3 h-3 text-slate-400" /> Viviendas
                     </span>
-                    <span className="font-mono font-semibold text-slate-700">
+                    <span className="text-xs font-extrabold text-slate-800">
                       {vivA.toLocaleString("es-MX")}
                     </span>
                   </div>
@@ -307,80 +318,93 @@ export function ComparisonPanel() {
               </div>
             ) : (
               <div className="py-8 text-center text-[11px] text-slate-400 italic">
-                Toca una zona en el mapa
+                Selecciona la zona A
               </div>
             )}
           </div>
 
-          {/* ZONA B */}
-          <div className="bg-white p-3 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between space-y-3">
+          {/* TARJETA ZONA B */}
+          <div className="bg-white p-3.5 rounded-[22px] border border-slate-100 shadow-sm flex flex-col justify-between space-y-3">
             <div>
               <div className="flex items-center justify-between mb-2">
-                <span className="px-2 py-0.5 rounded-md bg-amber-100 text-amber-800 font-black text-[11px]">
+                <span className="px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-700 font-black text-[10px] uppercase tracking-wider">
                   Zona B
                 </span>
                 {selectedB && (
                   <button
                     onClick={() => setSelectedB(null)}
-                    className="text-[10px] text-slate-400 hover:text-slate-600 hover:underline"
+                    className="text-[10px] text-slate-400 hover:text-slate-600 font-medium"
                   >
                     Limpiar
                   </button>
                 )}
               </div>
 
-              <h3 className="text-xs font-bold text-slate-800 uppercase line-clamp-2 min-h-[2rem]">
+              <h3 className="text-xs font-black text-slate-800 uppercase line-clamp-2 min-h-[2.2rem] leading-tight">
                 {selectedB ? getNombre(selectedB) : "Sin Selección"}
               </h3>
             </div>
 
             {selectedB ? (
               <div className="space-y-3 pt-2 border-t border-slate-100">
-                {/* Total */}
+                {/* Población Total */}
                 <div>
-                  <span className="text-[10px] font-medium text-slate-400 uppercase block">Total</span>
-                  <span className="text-sm font-extrabold font-mono text-slate-900">
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                    Población Total
+                  </span>
+                  <span className="text-lg font-black text-slate-900 tracking-tight">
                     {totalB.toLocaleString("es-MX")}
                   </span>
                 </div>
 
-                {/* Barra Desglose Género */}
-                <div className="space-y-1">
-                  <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden flex">
-                    <div style={{ width: `${pctHombresB}%` }} className="bg-sky-500 h-full" />
+                {/* Desglose Género */}
+                <div className="space-y-2">
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                    Distribución
+                  </span>
+
+                  <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden flex">
+                    <div style={{ width: `${pctHombresB}%` }} className="bg-blue-600 h-full" />
                     <div style={{ width: `${pctMujeresB}%` }} className="bg-pink-500 h-full" />
                   </div>
 
-                  <div className="space-y-1 pt-1">
-                    {/* Hombres */}
-                    <div className="flex justify-between items-center text-[11px]">
-                      <span className="text-sky-600 font-semibold flex items-center gap-1">
-                        <span className="w-1.5 h-1.5 rounded-full bg-sky-500" /> Homb.
-                      </span>
-                      <span className="font-mono font-bold text-slate-700">
-                        {hombresB.toLocaleString("es-MX")}
-                      </span>
+                  {/* Cajas Hombres y Mujeres estilo Píldora */}
+                  <div className="space-y-1.5">
+                    <div className="bg-slate-50 p-2 rounded-xl flex items-center justify-between">
+                      <div className="flex items-center gap-1.5">
+                        <span className="w-2 h-2 rounded-full bg-blue-600" />
+                        <span className="text-[10px] font-bold text-slate-700">Hombres</span>
+                      </div>
+                      <div className="text-right">
+                        <span className="text-xs font-black text-slate-800 block">
+                          {hombresB.toLocaleString("es-MX")}
+                        </span>
+                        <span className="text-[9px] text-slate-400 font-medium">{pctHombresB}%</span>
+                      </div>
                     </div>
 
-                    {/* Mujeres */}
-                    <div className="flex justify-between items-center text-[11px]">
-                      <span className="text-pink-600 font-semibold flex items-center gap-1">
-                        <span className="w-1.5 h-1.5 rounded-full bg-pink-500" /> Muj.
-                      </span>
-                      <span className="font-mono font-bold text-slate-700">
-                        {mujeresB.toLocaleString("es-MX")}
-                      </span>
+                    <div className="bg-slate-50 p-2 rounded-xl flex items-center justify-between">
+                      <div className="flex items-center gap-1.5">
+                        <span className="w-2 h-2 rounded-full bg-pink-500" />
+                        <span className="text-[10px] font-bold text-slate-700">Mujeres</span>
+                      </div>
+                      <div className="text-right">
+                        <span className="text-xs font-black text-slate-800 block">
+                          {mujeresB.toLocaleString("es-MX")}
+                        </span>
+                        <span className="text-[9px] text-slate-400 font-medium">{pctMujeresB}%</span>
+                      </div>
                     </div>
                   </div>
                 </div>
 
                 {/* Viviendas */}
                 {vivB > 0 && (
-                  <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px]">
-                    <span className="text-slate-400 flex items-center gap-1">
-                      <Home className="w-3 h-3" /> Viv.
+                  <div className="pt-2 border-t border-slate-100 flex items-center justify-between">
+                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
+                      <Home className="w-3 h-3 text-slate-400" /> Viviendas
                     </span>
-                    <span className="font-mono font-semibold text-slate-700">
+                    <span className="text-xs font-extrabold text-slate-800">
                       {vivB.toLocaleString("es-MX")}
                     </span>
                   </div>
@@ -388,7 +412,7 @@ export function ComparisonPanel() {
               </div>
             ) : (
               <div className="py-8 text-center text-[11px] text-slate-400 italic">
-                Selecciona con menú contextual
+                Selecciona la zona B
               </div>
             )}
           </div>
@@ -397,10 +421,10 @@ export function ComparisonPanel() {
 
       </div>
 
-      {/* 3. PIE DE PÁGINA */}
-      <div className="p-3 bg-white border-t border-slate-200/80 text-center shrink-0">
-        <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest">
-          Visor Demográfico • Tabasco
+      {/* 3. PIE DE PÁGINA IDÉNTICO AL ORIGINAL */}
+      <div className="p-3 bg-white border-t border-slate-100 text-center shrink-0">
+        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+          TABASCO GEOGRÁFICO • SISTEMA DE ANÁLISIS
         </span>
       </div>
     </div>

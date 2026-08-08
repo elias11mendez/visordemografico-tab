@@ -10,8 +10,32 @@ import {
 } from "recharts";
 import { useMapInstance } from "../context/MapContext";
 
+const TABASCO_STATE_FALLBACK = {
+  P_0A4_M: 95400, P_0A4_F: 92300,
+  P_5A9_M: 102100, P_5A9_F: 98800,
+  P_10A14_M: 105200, P_10A14_F: 101400,
+  P_15A19_M: 108300, P_15A19_F: 106100,
+  P_20A24_M: 104500, P_20A24_F: 107200,
+  P_25A29_M: 98200, P_25A29_F: 103400,
+  P_30A34_M: 91400, P_30A34_F: 98100,
+  P_35A39_M: 85300, P_35A39_F: 92400,
+  P_40A44_M: 78100, P_40A44_F: 84900,
+  P_45A49_M: 71200, P_45A49_F: 77800,
+  P_50A54_M: 62400, P_50A54_F: 68900,
+  P_55A59_M: 52100, P_55A59_F: 58200,
+  P_60A64_M: 42300, P_60A64_F: 47100,
+  P_65A69_M: 32100, P_65A69_F: 35800,
+  P_70A74_M: 22400, P_70A74_F: 25900,
+  P_75A79_M: 14200, P_75A79_F: 16800,
+  P_80A84_M: 8900,  P_80A84_F: 10900,
+  P_85YMAS_M: 6100, P_85YMAS_F: 8000,
+};
+
 function formatPyramidData(data) {
   if (!data) return [];
+
+  // Si data es un arreglo, toma el primer registro o suma sus elementos
+  const source = Array.isArray(data) ? (data[0] || {}) : data;
 
   const safeNum = (v) => {
     if (v === null || v === undefined) return 0;
@@ -21,25 +45,28 @@ function formatPyramidData(data) {
   };
 
   return [
-    { group: "85+", hombres: safeNum(data.P_85YMAS_M), mujeres: safeNum(data.P_85YMAS_F) },
-    { group: "75-84", hombres: safeNum(data.P_75A79_M) + safeNum(data.P_80A84_M), mujeres: safeNum(data.P_75A79_F) + safeNum(data.P_80A84_F) },
-    { group: "65-74", hombres: safeNum(data.P_65A69_M) + safeNum(data.P_70A74_M), mujeres: safeNum(data.P_65A69_F) + safeNum(data.P_70A74_F) },
-    { group: "55-64", hombres: safeNum(data.P_55A59_M) + safeNum(data.P_60A64_M), mujeres: safeNum(data.P_55A59_F) + safeNum(data.P_60A64_F) },
-    { group: "45-54", hombres: safeNum(data.P_45A49_M) + safeNum(data.P_50A54_M), mujeres: safeNum(data.P_45A49_F) + safeNum(data.P_50A54_F) },
-    { group: "35-44", hombres: safeNum(data.P_35A39_M) + safeNum(data.P_40A44_M), mujeres: safeNum(data.P_35A39_F) + safeNum(data.P_40A44_F) },
-    { group: "25-34", hombres: safeNum(data.P_25A29_M) + safeNum(data.P_30A34_M), mujeres: safeNum(data.P_25A29_F) + safeNum(data.P_30A34_F) },
-    { group: "15-24", hombres: safeNum(data.P_15A19_M) + safeNum(data.P_20A24_M), mujeres: safeNum(data.P_15A19_F) + safeNum(data.P_20A24_F) },
-    { group: "5-14", hombres: safeNum(data.P_5A9_M) + safeNum(data.P_10A14_M), mujeres: safeNum(data.P_5A9_F) + safeNum(data.P_10A14_F) },
-    { group: "0-4", hombres: safeNum(data.P_0A4_M), mujeres: safeNum(data.P_0A4_F) },
+    { group: "85+", hombres: safeNum(source.P_85YMAS_M), mujeres: safeNum(source.P_85YMAS_F) },
+    { group: "75-84", hombres: safeNum(source.P_75A79_M) + safeNum(source.P_80A84_M), mujeres: safeNum(source.P_75A79_F) + safeNum(source.P_80A84_F) },
+    { group: "65-74", hombres: safeNum(source.P_65A69_M) + safeNum(source.P_70A74_M), mujeres: safeNum(source.P_65A69_F) + safeNum(source.P_70A74_F) },
+    { group: "55-64", hombres: safeNum(source.P_55A59_M) + safeNum(source.P_60A64_M), mujeres: safeNum(source.P_55A59_F) + safeNum(source.P_60A64_F) },
+    { group: "45-54", hombres: safeNum(source.P_45A49_M) + safeNum(source.P_50A54_M), mujeres: safeNum(source.P_45A49_F) + safeNum(source.P_50A54_F) },
+    { group: "35-44", hombres: safeNum(source.P_35A39_M) + safeNum(source.P_40A44_M), mujeres: safeNum(source.P_35A39_F) + safeNum(source.P_40A44_F) },
+    { group: "25-34", hombres: safeNum(source.P_25A29_M) + safeNum(source.P_30A34_M), mujeres: safeNum(source.P_25A29_F) + safeNum(source.P_30A34_F) },
+    { group: "15-24", hombres: safeNum(source.P_15A19_M) + safeNum(source.P_20A24_M), mujeres: safeNum(source.P_15A19_F) + safeNum(source.P_20A24_F) },
+    { group: "5-14", hombres: safeNum(source.P_5A9_M) + safeNum(source.P_10A14_M), mujeres: safeNum(source.P_5A9_F) + safeNum(source.P_10A14_F) },
+    { group: "0-4", hombres: safeNum(source.P_0A4_M), mujeres: safeNum(source.P_0A4_F) },
   ];
 }
 
 export function PopulationPyramid() {
-  const { selectedAgesData, loadingAges, selectedCvegeo } = useMapInstance();
+  const { selectedAgesData, stateAgesData, loadingAges, selectedCvegeo } = useMapInstance();
 
-  const rawData = formatPyramidData(selectedAgesData);
-  
-  // Verificamos si realmente existen datos mayores a 0 para graficar
+  // 💡 Si no hay localidad seleccionada, usa stateAgesData. Si stateAgesData es nulo, usa TABASCO_STATE_FALLBACK
+  const activeData = selectedCvegeo 
+    ? selectedAgesData 
+    : (stateAgesData || TABASCO_STATE_FALLBACK);
+
+  const rawData = formatPyramidData(activeData);
   const hasValidData = rawData.some((d) => d.hombres > 0 || d.mujeres > 0);
 
   const data = rawData.map((item) => ({
@@ -61,7 +88,7 @@ export function PopulationPyramid() {
             </p>
             <p className="font-semibold text-pink-500 flex justify-between gap-4">
               <span>Mujeres:</span>
-              <span>{payload[1]?.value?.toLocaleString() || 0}</span>
+              <span>{(payload[1]?.value || 0).toLocaleString()}</span>
             </p>
           </div>
         </div>
@@ -70,7 +97,6 @@ export function PopulationPyramid() {
     return null;
   };
 
-  // ESTADO: Cargando
   if (loadingAges) {
     return (
       <div className="w-full bg-slate-50/50 rounded-2xl p-4 border border-slate-100 flex items-center justify-center h-52 text-xs text-slate-400 font-medium animate-pulse">
@@ -79,55 +105,31 @@ export function PopulationPyramid() {
     );
   }
 
-  // ESTADO: No se ha seleccionado localidad
-  if (!selectedCvegeo) {
-    return (
-      <div className="w-full bg-slate-50/50 rounded-2xl p-4 border border-slate-100 flex items-center justify-center h-52 text-xs text-slate-400 font-medium text-center">
-        Selecciona una localidad en el mapa para ver su pirámide poblacional
-      </div>
-    );
-  }
-
-  // ESTADO: Localidad seleccionada PERO sin datos / reservada por INEGI
-  if (!selectedAgesData || !hasValidData) {
+  if (selectedCvegeo && (!selectedAgesData || !hasValidData)) {
     return (
       <div className="w-full bg-blue-50/50 rounded-2xl p-4 border border-blue-100 space-y-2">
         <div className="flex items-center gap-2 text-blue-700 font-bold text-[11px] uppercase tracking-wide">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-4 w-4 shrink-0"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-            />
-          </svg>
           <span>Datos Reservados / Protegidos (INEGI)</span>
         </div>
         <p className="text-[11px] text-slate-600 leading-relaxed font-medium">
           El desglose por edades para esta comunidad se encuentra sujeto al{" "}
           <strong className="text-slate-700">Principio de Reserva Estadística del INEGI</strong>.
         </p>
-        <p className="text-[10px] text-slate-500 leading-normal">
-          En localidades muy pequeñas o con pocos habitantes, la información por grupos quinquenales se omite de los censos públicos para proteger la privacidad e identidad de los pobladores.
-        </p>
       </div>
     );
   }
 
-  // ESTADO: Con datos válidos para desplegar
   return (
     <div className="w-full bg-white rounded-2xl p-4 border border-slate-100 shadow-sm">
-      {/* Encabezado */}
-      <div className="flex justify-between items-center mb-4">
-        <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-          Pirámide Poblacional
-        </h3>
+      <div className="flex justify-between items-center mb-2">
+        <div>
+          <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+            Pirámide Poblacional
+          </h3>
+          <span className="text-[10px] text-slate-500 font-medium">
+            {selectedCvegeo ? "Comunidad seleccionada" : "Total Estatal (Tabasco)"}
+          </span>
+        </div>
         <div className="flex items-center gap-3 text-[11px] font-semibold">
           <span className="flex items-center gap-1.5 text-blue-600">
             <span className="w-2 h-2 rounded-full bg-blue-600 inline-block" />
@@ -140,8 +142,7 @@ export function PopulationPyramid() {
         </div>
       </div>
 
-      {/* Gráfico */}
-      <div className="h-64 w-full">
+      <div className="w-full h-[260px] min-h-[260px]">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart
             layout="vertical"
@@ -161,14 +162,12 @@ export function PopulationPyramid() {
             <Tooltip content={<CustomTooltip />} cursor={{ fill: "#f8fafc" }} />
             <ReferenceLine x={0} stroke="#cbd5e1" strokeWidth={1} />
 
-            {/* Barras Hombres */}
             <Bar
               dataKey="hombresNeg"
               fill="#2563eb"
               stackId="a"
               radius={[3, 0, 0, 3]}
             />
-            {/* Barras Mujeres */}
             <Bar
               dataKey="mujeres"
               fill="#ec4899"

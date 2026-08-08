@@ -35,8 +35,9 @@ const Toolbar = ({ showHeatmap, setShowHeatmap }) => {
     {
       id: "location",
       icon: <MapPin size={18} />,
-      label: "Mi Ubicación",
+      label: "Mi Ubicación (Proximamente)",
       action: handleGetUserLocation || (() => console.log("Ubicación")),
+      disabled: true,
     },
     {
       id: "layers",
@@ -66,6 +67,8 @@ const Toolbar = ({ showHeatmap, setShowHeatmap }) => {
       label: "Alertas",
       action: () => togglePanel("alerts"),
       active: activePanel === "alerts",
+      disabled: true,
+
       panel: (
         <div className="w-52 h-16 bg-white/90 backdrop-blur-md border border-slate-200 rounded-xl shadow-xl p-3 flex items-center">
           Panel de Alertas
@@ -116,12 +119,17 @@ const Toolbar = ({ showHeatmap, setShowHeatmap }) => {
           <div key={tool.id} className="relative flex items-center">
             {/* BOTÓN DE LA HERRAMIENTA */}
             <button
-              onClick={tool.action}
-              title={tool.label}
+              onClick={tool.disabled ? undefined : tool.action}
+              disabled={tool.disabled}
+              title={
+                tool.disabled ? `${tool.label} (No disponible)` : tool.label
+              }
               className={`p-1.5 sm:p-2.5 rounded-lg transition-all duration-200 group flex items-center justify-center ${
-                tool.active
-                  ? tool.activeClass || "bg-slate-100 text-black"
-                  : " text-slate-600 hover:bg-slate-100 hover:text-black"
+                tool.disabled
+                  ? "opacity-35 cursor-not-allowed pointer-events-none text-slate-400"
+                  : tool.active
+                    ? tool.activeClass || "bg-slate-100 text-black"
+                    : "text-slate-600 hover:bg-slate-100 hover:text-black"
               }`}
             >
               <div className="scale-85 sm:scale-100 flex items-center justify-center">
@@ -135,7 +143,7 @@ const Toolbar = ({ showHeatmap, setShowHeatmap }) => {
             </button>
 
             {/* PANEL ALINEADO AL MISMO NIVEL DEL BOTÓN */}
-            {tool.active && tool.panel && (
+            {!tool.disabled && tool.active && tool.panel && (
               <div className="absolute left-full ml-4 z-50 animate-in fade-in slide-in-from-left-2 whitespace-nowrap">
                 {tool.panel}
               </div>

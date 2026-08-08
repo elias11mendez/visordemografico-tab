@@ -233,16 +233,8 @@ export const DemographyPanel = () => {
             </div>
           </>
         ) : (
-          <div className="p-5 border border-amber-200/80 bg-amber-50/60 rounded-2xl space-y-3 text-slate-700">
-            <div className="flex items-center gap-2 text-amber-800 font-bold text-xs uppercase tracking-wide">
-              <span>Información Reservada (INEGI)</span>
-            </div>
-            <p className="text-xs leading-relaxed font-medium text-slate-700">
-              Los datos censales de esta localidad están sujetos al{" "}
-              <strong className="text-slate-900 font-bold">
-                Principio de Reserva Estadística del INEGI
-              </strong>.
-            </p>
+          <div>
+           
           </div>
         )}
       </div>
